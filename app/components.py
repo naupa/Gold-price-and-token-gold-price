@@ -126,7 +126,6 @@ def difference_chart_card(title: str, data: rx.Var[list[dict]]) -> rx.Component:
         rx.el.div(
             rx.el.h2(title, class_name="text-lg font-medium text-gray-800"),
             rx.el.div(
-                legend_item("bg-purple-500", "Absolute Difference ($)"),
                 legend_item("bg-teal-500", "Relative Difference (%)"),
                 class_name="flex items-center gap-4",
             ),
@@ -148,39 +147,12 @@ def difference_chart_card(title: str, data: rx.Var[list[dict]]) -> rx.Component:
                 custom_attrs={"fontSize": "12px"},
             ),
             rx.recharts.y_axis(
-                y_axis_id="left",
                 tick_line=False,
                 axis_line=False,
                 tick_margin=10,
-                domain=["auto", "auto"],
+                domain=[-5, 5],
                 allow_decimals=True,
                 custom_attrs={"fontSize": "12px"},
-            ),
-            rx.recharts.y_axis(
-                y_axis_id="right",
-                orientation="right",
-                tick_line=False,
-                axis_line=False,
-                tick_margin=10,
-                domain=["auto", "auto"],
-                allow_decimals=True,
-                custom_attrs={"fontSize": "12px"},
-            ),
-            rx.recharts.area(
-                data_key="absolute",
-                name="Absolute Difference",
-                type_="monotone",
-                stroke="#8b5cf6",
-                fill="rgba(139, 92, 246, 0.2)",
-                stroke_width=2,
-                y_axis_id="left",
-                dot=True,
-                active_dot={
-                    "r": 6,
-                    "stroke_width": 2,
-                    "stroke": "#FFFFFF",
-                    "fill": "#8b5cf6",
-                },
             ),
             rx.recharts.area(
                 data_key="relative",
@@ -189,7 +161,6 @@ def difference_chart_card(title: str, data: rx.Var[list[dict]]) -> rx.Component:
                 stroke="#14b8a6",
                 fill="rgba(20, 184, 166, 0.2)",
                 stroke_width=2,
-                y_axis_id="right",
                 dot=True,
                 active_dot={
                     "r": 6,

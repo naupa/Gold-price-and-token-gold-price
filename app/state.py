@@ -27,7 +27,6 @@ class PricePoint(TypedDict):
 
 class DifferencePoint(TypedDict):
     time: str
-    absolute: float | None
     relative: float | None
 
 
@@ -103,22 +102,14 @@ class TimeSeriesState(rx.State):
         """Computed var for the difference between price_a and price_b."""
         diff_data = []
         for point in self.data:
-            absolute_diff = None
             relative_diff = None
             if (
                 point["price_a"] is not None
                 and point["price_b"] is not None
                 and (point["price_b"] != 0)
             ):
-                absolute_diff = round(point["price_a"] - point["price_b"], 2)
                 relative_diff = round(
                     (point["price_a"] - point["price_b"]) / point["price_b"] * 100, 2
                 )
-            diff_data.append(
-                {
-                    "time": point["time"],
-                    "absolute": absolute_diff,
-                    "relative": relative_diff,
-                }
-            )
+            diff_data.append({"time": point["time"], "relative": relative_diff})
         return diff_data
