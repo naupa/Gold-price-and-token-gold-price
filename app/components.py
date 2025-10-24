@@ -120,6 +120,93 @@ def chart_card(title: str, data: rx.Var[list[dict]]) -> rx.Component:
     )
 
 
+def difference_chart_card(title: str, data: rx.Var[list[dict]]) -> rx.Component:
+    """A card component to display the difference chart."""
+    return rx.el.div(
+        rx.el.div(
+            rx.el.h2(title, class_name="text-lg font-medium text-gray-800"),
+            rx.el.div(
+                legend_item("bg-purple-500", "Absolute Difference ($)"),
+                legend_item("bg-teal-500", "Relative Difference (%)"),
+                class_name="flex items-center gap-4",
+            ),
+            class_name="flex justify-between items-center mb-4",
+        ),
+        rx.recharts.area_chart(
+            rx.recharts.cartesian_grid(
+                stroke_dasharray="3 3",
+                horizontal=True,
+                vertical=False,
+                stroke=CHART_CONFIG["grid_stroke"],
+            ),
+            rx.recharts.graphing_tooltip(**TOOLTIP_PROPS),
+            rx.recharts.x_axis(
+                data_key="time",
+                tick_line=False,
+                axis_line=False,
+                tick_margin=10,
+                custom_attrs={"fontSize": "12px"},
+            ),
+            rx.recharts.y_axis(
+                y_axis_id="left",
+                tick_line=False,
+                axis_line=False,
+                tick_margin=10,
+                domain=["auto", "auto"],
+                allow_decimals=True,
+                custom_attrs={"fontSize": "12px"},
+            ),
+            rx.recharts.y_axis(
+                y_axis_id="right",
+                orientation="right",
+                tick_line=False,
+                axis_line=False,
+                tick_margin=10,
+                domain=["auto", "auto"],
+                allow_decimals=True,
+                custom_attrs={"fontSize": "12px"},
+            ),
+            rx.recharts.area(
+                data_key="absolute",
+                name="Absolute Difference",
+                type_="monotone",
+                stroke="#8b5cf6",
+                fill="rgba(139, 92, 246, 0.2)",
+                stroke_width=2,
+                y_axis_id="left",
+                dot=True,
+                active_dot={
+                    "r": 6,
+                    "stroke_width": 2,
+                    "stroke": "#FFFFFF",
+                    "fill": "#8b5cf6",
+                },
+            ),
+            rx.recharts.area(
+                data_key="relative",
+                name="Relative Difference",
+                type_="monotone",
+                stroke="#14b8a6",
+                fill="rgba(20, 184, 166, 0.2)",
+                stroke_width=2,
+                y_axis_id="right",
+                dot=True,
+                active_dot={
+                    "r": 6,
+                    "stroke_width": 2,
+                    "stroke": "#FFFFFF",
+                    "fill": "#14b8a6",
+                },
+            ),
+            data=data,
+            height=CHART_CONFIG["height"],
+            margin=CHART_CONFIG["margin"],
+            class_name="[&_.recharts-tooltip-cursor]:stroke-gray-300",
+        ),
+        class_name="bg-white rounded-2xl p-6 shadow-[0px_1px_3px_rgba(0,0,0,0.12)] hover:shadow-[0px_4px_8px_rgba(0,0,0,0.15)] transition-shadow duration-300",
+    )
+
+
 def header() -> rx.Component:
     """The header component for the dashboard."""
     return rx.el.header(

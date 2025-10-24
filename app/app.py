@@ -1,6 +1,6 @@
 import reflex as rx
 from app.state import TimeSeriesState
-from app.components import chart_card, header
+from app.components import chart_card, header, difference_chart_card
 
 
 def index() -> rx.Component:
@@ -9,7 +9,11 @@ def index() -> rx.Component:
         rx.el.main(
             rx.el.div(
                 chart_card("Real-Time Price Feed", TimeSeriesState.data),
-                class_name="w-full",
+                difference_chart_card(
+                    "Price Difference (Absolute & Relative)",
+                    TimeSeriesState.difference_data,
+                ),
+                class_name="w-full space-y-6",
             ),
             class_name="p-8 w-full max-w-7xl mx-auto",
         ),

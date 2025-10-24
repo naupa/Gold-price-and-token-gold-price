@@ -25,6 +25,12 @@ class PricePoint(TypedDict):
     price_b: float | None
 
 
+class DifferencePoint(TypedDict):
+    time: str
+    absolute: float | None
+    relative: float | None
+
+
 def get_data() -> PricePoint:
     """Fetch price data from MEXC and Edelmetalle APIs."""
     http = urllib3.PoolManager()
@@ -91,3 +97,28 @@ class TimeSeriesState(rx.State):
                 if new_point["price_a"] is not None or new_point["price_b"] is not None:
                     self.data = current_data + [new_point]
                 self.last_updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    @rx.var
+    def difference_data(self) -> list[DifferencePoint]:
+        """Computed var for the difference between price_a and price_b."""
+        diff_data = []
+        for point in self.data:
+            absolute_diff = None
+            relative_diff = None
+            if (
+                point["price_a"] is not None
+                and point["price_b"] is not None
+                and (point["price_b"] != 0)
+            ):
+                absolute_diff = round(point["price_a"] - point["price_b"], 2)
+                relative_diff = round(
+                    (point["price_a"] - point["price_b"]) / point["price_b"] * 100, 2
+                )
+            diff_data.append(
+                {
+                    "time": point["time"],
+                    "absolute": absolute_diff,
+                    "relative": relative_diff,
+                }
+            )
+        return diff_data
