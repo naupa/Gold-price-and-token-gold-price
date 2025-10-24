@@ -66,6 +66,9 @@ def chart_card(title: str, data: rx.Var[list[dict]]) -> rx.Component:
                 stroke=CHART_CONFIG["grid_stroke"],
             ),
             rx.recharts.graphing_tooltip(**TOOLTIP_PROPS),
+            rx.recharts.reference_line(
+                y=0, stroke="#a1a1aa", stroke_width=1, stroke_dasharray="3 3"
+            ),
             rx.recharts.x_axis(
                 data_key="time",
                 tick_line=False,
