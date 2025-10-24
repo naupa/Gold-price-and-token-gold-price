@@ -88,7 +88,7 @@ def chart_card(title: str, data: rx.Var[list[dict]]) -> rx.Component:
                 stroke=SERIES_CONFIG["price_a"]["stroke"],
                 fill=SERIES_CONFIG["price_a"]["fill"],
                 stroke_width=2,
-                dot=False,
+                dot=True,
                 active_dot={
                     "r": 6,
                     "stroke_width": 2,
@@ -103,7 +103,7 @@ def chart_card(title: str, data: rx.Var[list[dict]]) -> rx.Component:
                 stroke=SERIES_CONFIG["price_b"]["stroke"],
                 fill=SERIES_CONFIG["price_b"]["fill"],
                 stroke_width=2,
-                dot=False,
+                dot=True,
                 active_dot={
                     "r": 6,
                     "stroke_width": 2,
