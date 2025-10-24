@@ -9,7 +9,7 @@ from typing import TypedDict, Literal
 
 DEFAULT_CONFIG = {
     "api_endpoints": {
-        "mexc": "https://api.mexc.com/api/v3/ticker/price?symbol=BTCUSDT",
+        "mexc": "https://api.mexc.com/api/v3/ticker/price?symbol=XAUTUSDT",
         "edelmetalle": "https://api.edelmetalle.de/public.json",
     },
     "data_settings": {"data_point_count_limit": 50, "update_interval_seconds": 5},

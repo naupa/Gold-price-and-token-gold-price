@@ -7,7 +7,7 @@ DEFAULT_CONFIG = {
     "chart_config": {
         "series": {
             "price_a": {
-                "name": "BTC/USDT",
+                "name": "XAU/USDT",
                 "stroke": "#3b82f6",
                 "fill": "rgba(59, 130, 246, 0.2)",
             },
@@ -52,7 +52,7 @@ def chart_card(title: str, data: rx.Var[list[dict]]) -> rx.Component:
         rx.el.div(
             rx.el.h2(title, class_name="text-lg font-medium text-gray-800"),
             rx.el.div(
-                legend_item("bg-blue-500", SERIES_CONFIG["price_a"]["name"]),
+                legend_item("bg-blue-500", "XAU/USDT"),
                 legend_item("bg-orange-500", SERIES_CONFIG["price_b"]["name"]),
                 class_name="flex items-center gap-4",
             ),
