@@ -150,7 +150,7 @@ def difference_chart_card(title: str, data: rx.Var[list[dict]]) -> rx.Component:
                 tick_line=False,
                 axis_line=False,
                 tick_margin=10,
-                domain=[-1, 1],
+                domain=[-0.75, 0.75],
                 allow_decimals=True,
                 custom_attrs={"fontSize": "12px"},
             ),
