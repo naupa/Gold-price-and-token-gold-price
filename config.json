@@ -1,0 +1,45 @@
+{
+  "api_endpoints": {
+    "mexc": "https://api.mexc.com/api/v3/ticker/price?symbol=BTCUSDT",
+    "edelmetalle": "https://www.edelmetalle-direkt.de/api/au_eur_bar.php"
+  },
+  "data_settings": {
+    "data_point_count_limit": 240,
+    "update_interval_seconds": 5
+  },
+  "chart_config": {
+    "series": {
+      "price_a": {
+        "name": "BTC/USDT",
+        "stroke": "#3b82f6",
+        "fill": "rgba(59, 130, 246, 0.2)"
+      },
+      "price_b": {
+        "name": "Gold/USD",
+        "stroke": "#f97316",
+        "fill": "rgba(249, 115, 22, 0.2)"
+      }
+    },
+    "tooltip_props": {
+      "cursor": false,
+      "content_style": {
+        "backgroundColor": "#FFFFFF",
+        "border": "1px solid #E5E7EB",
+        "borderRadius": "0.75rem",
+        "boxShadow": "0px 1px 3px rgba(0,0,0,0.12)"
+      },
+      "label_style": {
+        "fontWeight": "600",
+        "color": "#1F2937"
+      }
+    },
+    "grid_stroke": "#e5e7eb",
+    "height": 300,
+    "margin": {
+      "top": 5,
+      "right": 20,
+      "left": -10,
+      "bottom": 5
+    }
+  }
+}

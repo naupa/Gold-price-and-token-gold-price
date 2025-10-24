@@ -1,24 +1,46 @@
 import reflex as rx
 from app.state import TimeSeriesState
+import json
+import logging
 
-TOOLTIP_PROPS = {
-    "content_style": {
-        "background": "#FFFFFF",
-        "border": "1px solid #E0E0E0",
-        "border_radius": "8px",
-        "box_shadow": "0px 1px 3px rgba(0,0,0,0.12)",
-        "font_family": "Roboto",
-        "font_size": "14px",
-    },
-    "label_style": {"color": "#212121", "font_weight": "500"},
-    "item_style": {"color": "#00796B"},
-    "separator": ": ",
+DEFAULT_CONFIG = {
+    "chart_config": {
+        "series": {
+            "price_a": {
+                "name": "BTC/USDT",
+                "stroke": "#3b82f6",
+                "fill": "rgba(59, 130, 246, 0.2)",
+            },
+            "price_b": {
+                "name": "Gold/USD",
+                "stroke": "#f97316",
+                "fill": "rgba(249, 115, 22, 0.2)",
+            },
+        },
+        "tooltip_props": {
+            "cursor": False,
+            "content_style": {
+                "backgroundColor": "#FFFFFF",
+                "border": "1px solid #E5E7EB",
+                "borderRadius": "0.75rem",
+                "boxShadow": "0px 1px 3px rgba(0,0,0,0.12)",
+            },
+            "label_style": {"fontWeight": "600", "color": "#1F2937"},
+        },
+        "grid_stroke": "#e5e7eb",
+        "height": 300,
+        "margin": {"top": 5, "right": 20, "left": -10, "bottom": 5},
+    }
 }
+config = DEFAULT_CONFIG
+CHART_CONFIG = config["chart_config"]
+SERIES_CONFIG = CHART_CONFIG["series"]
+TOOLTIP_PROPS = CHART_CONFIG["tooltip_props"]
 
 
 def legend_item(color: str, name: str) -> rx.Component:
     return rx.el.div(
-        rx.el.div(class_name=f"w-3 h-3 rounded-sm bg-[{color}]"),
+        rx.el.div(class_name=f"w-3 h-3 rounded-sm {color}"),
         rx.el.span(name, class_name="text-sm text-gray-600 font-medium"),
         class_name="flex items-center gap-2",
     )
@@ -30,8 +52,8 @@ def chart_card(title: str, data: rx.Var[list[dict]]) -> rx.Component:
         rx.el.div(
             rx.el.h2(title, class_name="text-lg font-medium text-gray-800"),
             rx.el.div(
-                legend_item("#009688", "XAUT"),
-                legend_item("#607D8B", "Gold USD"),
+                legend_item("bg-blue-500", SERIES_CONFIG["price_a"]["name"]),
+                legend_item("bg-orange-500", SERIES_CONFIG["price_b"]["name"]),
                 class_name="flex items-center gap-4",
             ),
             class_name="flex justify-between items-center mb-4",
@@ -41,7 +63,7 @@ def chart_card(title: str, data: rx.Var[list[dict]]) -> rx.Component:
                 stroke_dasharray="3 3",
                 horizontal=True,
                 vertical=False,
-                stroke="#E0E0E0",
+                stroke=CHART_CONFIG["grid_stroke"],
             ),
             rx.recharts.graphing_tooltip(**TOOLTIP_PROPS),
             rx.recharts.x_axis(
@@ -49,53 +71,49 @@ def chart_card(title: str, data: rx.Var[list[dict]]) -> rx.Component:
                 tick_line=False,
                 axis_line=False,
                 tick_margin=10,
-                font_size="12px",
-                font_family="Roboto",
-                color="#757575",
+                custom_attrs={"fontSize": "12px"},
             ),
             rx.recharts.y_axis(
                 tick_line=False,
                 axis_line=False,
                 tick_margin=10,
-                font_size="12px",
-                font_family="Roboto",
-                color="#757575",
                 domain=["auto", "auto"],
                 allow_decimals=False,
+                custom_attrs={"fontSize": "12px"},
             ),
             rx.recharts.area(
                 data_key="price_a",
-                name="XAUT",
+                name=SERIES_CONFIG["price_a"]["name"],
                 type_="monotone",
-                stroke="#009688",
-                fill="rgba(0, 150, 136, 0.2)",
+                stroke=SERIES_CONFIG["price_a"]["stroke"],
+                fill=SERIES_CONFIG["price_a"]["fill"],
                 stroke_width=2,
-                dot=True,
+                dot=False,
                 active_dot={
                     "r": 6,
                     "stroke_width": 2,
                     "stroke": "#FFFFFF",
-                    "fill": "#009688",
+                    "fill": SERIES_CONFIG["price_a"]["stroke"],
                 },
             ),
             rx.recharts.area(
                 data_key="price_b",
-                name="Gold USD",
+                name=SERIES_CONFIG["price_b"]["name"],
                 type_="monotone",
-                stroke="#607D8B",
-                fill="rgba(96, 125, 139, 0.2)",
+                stroke=SERIES_CONFIG["price_b"]["stroke"],
+                fill=SERIES_CONFIG["price_b"]["fill"],
                 stroke_width=2,
-                dot=True,
+                dot=False,
                 active_dot={
                     "r": 6,
                     "stroke_width": 2,
                     "stroke": "#FFFFFF",
-                    "fill": "#607D8B",
+                    "fill": SERIES_CONFIG["price_b"]["stroke"],
                 },
             ),
             data=data,
-            height=300,
-            margin={"top": 5, "right": 20, "left": -10, "bottom": 5},
+            height=CHART_CONFIG["height"],
+            margin=CHART_CONFIG["margin"],
             class_name="[&_.recharts-tooltip-cursor]:stroke-gray-300",
         ),
         class_name="bg-white rounded-2xl p-6 shadow-[0px_1px_3px_rgba(0,0,0,0.12)] hover:shadow-[0px_4px_8px_rgba(0,0,0,0.15)] transition-shadow duration-300",
@@ -123,5 +141,5 @@ def header() -> rx.Component:
             ),
             class_name="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full",
         ),
-        class_name="w-full p-6 bg-white shadow-[0px_8px_16px_rgba(0,0,0,0.2)]",
+        class_name="w-full p-6 bg-white border-b border-gray-200",
     )

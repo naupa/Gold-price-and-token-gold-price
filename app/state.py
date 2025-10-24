@@ -1,38 +1,49 @@
 import reflex as rx
-import pandas as pd
 import numpy as np
 import asyncio
 from datetime import datetime
 import urllib3
 import json
 import logging
+from typing import TypedDict, Literal
+
+DEFAULT_CONFIG = {
+    "api_endpoints": {
+        "mexc": "https://api.mexc.com/api/v3/ticker/price?symbol=BTCUSDT",
+        "edelmetalle": "https://api.edelmetalle.de/public.json",
+    },
+    "data_settings": {"data_point_count_limit": 50, "update_interval_seconds": 5},
+}
+config = DEFAULT_CONFIG
+API_ENDPOINTS = config["api_endpoints"]
+DATA_SETTINGS = config["data_settings"]
 
 
-def get_data():
+class PricePoint(TypedDict):
+    time: str
+    price_a: float | None
+    price_b: float | None
+
+
+def get_data() -> PricePoint:
     """Fetch price data from MEXC and Edelmetalle APIs."""
     http = urllib3.PoolManager()
+    price_mexc = None
+    price_gold_de = None
     try:
-        r = http.request(
-            "GET", "https://api.mexc.com/api/v3/ticker/price?symbol=XAUTUSDT"
-        )
+        r = http.request("GET", API_ENDPOINTS["mexc"])
         if r.status == 200:
             data_mexc = json.loads(r.data.decode("utf-8"))
             price_mexc = float(data_mexc["price"])
-        else:
-            price_mexc = np.nan
     except Exception as e:
         logging.exception(f"Error fetching MEXC data: {e}")
-        price_mexc = np.nan
     try:
-        r = http.request("GET", "https://api.edelmetalle.de/public.json")
+        r = http.request("GET", API_ENDPOINTS["edelmetalle"])
         if r.status == 200:
             data_gold_de = json.loads(r.data.decode("utf-8"))
             price_gold_de = float(data_gold_de["gold_usd"])
-        else:
-            price_gold_de = np.nan
     except Exception as e:
         logging.exception(f"Error fetching Edelmetalle data: {e}")
-        price_gold_de = np.nan
     return {
         "time": datetime.now().strftime("%H:%M:%S"),
         "price_a": price_mexc,
@@ -41,9 +52,10 @@ def get_data():
 
 
 class TimeSeriesState(rx.State):
-    data: list[dict[str, str | float]] = []
+    data: list[PricePoint] = []
     last_updated: str = ""
-    _data_point_count: int = 240
+    _data_point_count: int = DATA_SETTINGS["data_point_count_limit"]
+    _update_interval: int = DATA_SETTINGS["update_interval_seconds"]
 
     def _generate_initial_data(self):
         """Helper to generate initial time series data."""
@@ -62,19 +74,20 @@ class TimeSeriesState(rx.State):
 
     @rx.event(background=True)
     async def update_data(self):
-        """Background task to update time series data every 5 seconds."""
+        """Background task to update time series data."""
         while True:
-            await asyncio.sleep(5)
+            await asyncio.sleep(self._update_interval)
             async with self:
                 new_point = get_data()
-                if np.isnan(new_point["price_a"]):
-                    if self.data:
+                if new_point["price_a"] is None:
+                    if self.data and self.data[-1]["price_a"] is not None:
                         new_point["price_a"] = self.data[-1]["price_a"]
-                if np.isnan(new_point["price_b"]):
-                    if self.data:
+                if new_point["price_b"] is None:
+                    if self.data and self.data[-1]["price_b"] is not None:
                         new_point["price_b"] = self.data[-1]["price_b"]
                 current_data = self.data
                 if len(current_data) >= self._data_point_count:
                     current_data = current_data[1:]
-                self.data = current_data + [new_point]
+                if new_point["price_a"] is not None or new_point["price_b"] is not None:
+                    self.data = current_data + [new_point]
                 self.last_updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
